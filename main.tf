@@ -152,6 +152,7 @@ module "aft_customizations" {
   sfn_s3_bucket_object_expiration_days              = var.sfn_s3_bucket_object_expiration_days
   customizations_audit_table_name                   = module.aft_account_request_framework.customizations_audit_table_name
   customizations_audit_table_arn                    = module.aft_account_request_framework.customizations_audit_table_arn
+  additional_customization_sources                  = var.additional_customization_sources
 }
 
 module "aft_feature_options" {

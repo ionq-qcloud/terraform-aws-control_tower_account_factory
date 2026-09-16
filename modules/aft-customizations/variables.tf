@@ -128,6 +128,16 @@ variable "codebuild_compute_type" {
   type = string
 }
 
+variable "additional_customization_sources" {
+  description = "Optional extra secondary sources attached to the global- and account-customizations CodeBuild projects (e.g. shared policy repos read at build time). Auth reuses this org's own CodeConnections connection (read from /aft/config/vcs/codeconnections-connection-arn -- the same SSM path AFT's own generated pipelines already read it from), so no separate credential is needed per source. Empty by default -- not an upstream AFT concept; kept isolated here to minimize merge conflicts on future upstream version upgrades."
+  type = list(object({
+    source_identifier = string
+    location          = string
+    source_version    = optional(string)
+  }))
+  default = []
+}
+
 variable "sns_topic_enable_cmk_encryption" {
   type = bool
 }

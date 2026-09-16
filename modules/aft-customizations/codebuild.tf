@@ -46,6 +46,32 @@ resource "aws_codebuild_project" "aft_global_customizations_terraform" {
     buildspec = data.local_file.aft_global_customizations_terraform.content
   }
 
+  dynamic "secondary_sources" {
+    for_each = var.additional_customization_sources
+    content {
+      type              = "GITHUB"
+      source_identifier = secondary_sources.value.source_identifier
+      location          = secondary_sources.value.location
+      git_clone_depth   = 1
+
+      auth {
+        type     = "CODECONNECTIONS"
+        resource = data.aws_ssm_parameter.codeconnections_connection_arn.value
+      }
+    }
+  }
+
+  dynamic "secondary_source_version" {
+    for_each = {
+      for s in var.additional_customization_sources : s.source_identifier => s.source_version
+      if s.source_version != null
+    }
+    content {
+      source_identifier = secondary_source_version.key
+      source_version    = secondary_source_version.value
+    }
+  }
+
   dynamic "vpc_config" {
     for_each = var.aft_enable_vpc ? [1] : []
     content {
@@ -117,6 +143,32 @@ resource "aws_codebuild_project" "aft_account_customizations_terraform" {
   source {
     type      = "CODEPIPELINE"
     buildspec = data.local_file.aft_account_customizations_terraform.content
+  }
+
+  dynamic "secondary_sources" {
+    for_each = var.additional_customization_sources
+    content {
+      type              = "GITHUB"
+      source_identifier = secondary_sources.value.source_identifier
+      location          = secondary_sources.value.location
+      git_clone_depth   = 1
+
+      auth {
+        type     = "CODECONNECTIONS"
+        resource = data.aws_ssm_parameter.codeconnections_connection_arn.value
+      }
+    }
+  }
+
+  dynamic "secondary_source_version" {
+    for_each = {
+      for s in var.additional_customization_sources : s.source_identifier => s.source_version
+      if s.source_version != null
+    }
+    content {
+      source_identifier = secondary_source_version.key
+      source_version    = secondary_source_version.value
+    }
   }
 
   dynamic "vpc_config" {

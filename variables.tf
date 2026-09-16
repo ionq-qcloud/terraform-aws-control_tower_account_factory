@@ -536,6 +536,16 @@ variable "aft_codebuild_compute_type" {
   }
 }
 
+variable "additional_customization_sources" {
+  description = "Optional extra secondary sources attached to the global- and account-customizations CodeBuild projects (e.g. shared policy repos read at build time). Auth reuses this org's own CodeConnections connection (read from /aft/config/vcs/codeconnections-connection-arn), so no separate credential is needed per source. Empty by default -- not an upstream AFT concept; kept isolated here to minimize merge conflicts on future upstream version upgrades."
+  type = list(object({
+    source_identifier = string
+    location          = string
+    source_version    = optional(string)
+  }))
+  default = []
+}
+
 variable "sns_topic_enable_cmk_encryption" {
   type        = bool
   description = "Flag toggling SNS topics encryption by using the AFT Customer managed key stored in KMS. Additional charges apply. Otherwise the SNS topics are encrypted using the AWS-managed KMS key."

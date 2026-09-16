@@ -29,3 +29,12 @@ data "local_file" "aft_account_customizations_terraform" {
 data "local_file" "aft_create_pipeline" {
   filename = "${path.module}/buildspecs/aft-create-pipeline.yml"
 }
+
+# Reused for additional_customization_sources' secondary_sources auth -- this is
+# the same, already-authorized CodeConnections connection AFT itself uses for
+# the customer's global/account customizations repos, read from the exact SSM
+# path AFT's own generated pipeline templates already read it from
+# (sources/aft-customizations-common/templates/customizations_pipeline/data.tf).
+data "aws_ssm_parameter" "codeconnections_connection_arn" {
+  name = "/aft/config/vcs/codeconnections-connection-arn"
+}
