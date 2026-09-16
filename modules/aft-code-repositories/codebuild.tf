@@ -49,6 +49,28 @@ resource "aws_codebuild_project" "account_request" {
     buildspec = data.local_file.account_request_buildspec.content
   }
 
+  dynamic "secondary_sources" {
+    for_each = var.conftest_repo_location != null ? [1] : []
+    content {
+      type              = "GITHUB"
+      source_identifier = "conftest"
+      location          = var.conftest_repo_location
+      git_clone_depth   = 1
+      auth {
+        type     = "CODECONNECTIONS"
+        resource = local.connection_arn[lower(var.vcs_provider)]
+      }
+    }
+  }
+
+  dynamic "secondary_source_version" {
+    for_each = var.conftest_repo_location != null && var.conftest_repo_version != null ? [1] : []
+    content {
+      source_identifier = "conftest"
+      source_version    = var.conftest_repo_version
+    }
+  }
+
   dynamic "vpc_config" {
     for_each = var.aft_enable_vpc ? [1] : []
     content {

@@ -110,6 +110,8 @@ module "aft_code_repositories" {
   global_codebuild_timeout                        = var.global_codebuild_timeout
   aft_enable_vpc                                  = module.aft_account_request_framework.vpc_deployment
   codebuild_compute_type                          = var.aft_codebuild_compute_type
+  conftest_repo_location                          = try(local.conftest_source.location, null)
+  conftest_repo_version                           = try(local.conftest_source.source_version, null)
 }
 
 module "aft_customizations" {

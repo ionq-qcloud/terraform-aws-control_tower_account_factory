@@ -63,6 +63,19 @@ phases:
             echo "No Jinja2 templates found - skipping template processing"
           fi
           for f in *.tf; do echo "\n \n"; echo $f; cat $f; done
+          if [ -n "${CODEBUILD_SRC_DIR_conftest:-}" ]; then
+            echo "[conftest] == Q-Cloud account naming check (qcloud-conftest, version pinned via CodeBuild secondary_source_version in the aft-code-repositories module) =="
+            CONFTEST_VERSION="0.69.0"
+            mkdir -p /tmp/conftest-bin
+            curl -fsSL "https://github.com/open-policy-agent/conftest/releases/download/v${CONFTEST_VERSION}/conftest_${CONFTEST_VERSION}_Linux_x86_64.tar.gz" | tar -xz -C /tmp/conftest-bin conftest
+            /tmp/conftest-bin/conftest test *.tf --parser hcl2 --policy "$CODEBUILD_SRC_DIR_conftest/by-repo/aft-account-request" 2>&1 | sed 's/^/[conftest] /'
+            rc=${PIPESTATUS[0]}
+            if [ "$rc" -ne 0 ]; then
+              exit 1
+            fi
+          else
+            echo "[conftest] qcloud-conftest secondary source not configured -- skipping naming check"
+          fi
           JSON=$(aws sts assume-role --role-arn ${AFT_ADMIN_ROLE_ARN} --role-session-name ${ROLE_SESSION_NAME})
           #Make newly assumed role default session
           export AWS_ACCESS_KEY_ID=$(echo ${JSON} | jq --raw-output ".Credentials[\"AccessKeyId\"]")

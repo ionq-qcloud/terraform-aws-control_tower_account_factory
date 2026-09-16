@@ -27,6 +27,12 @@ locals {
   enable_cloudtrail_lambda_function_name           = "aft-enable-cloudtrail"
   audit_trigger_lambda_function_name               = "aft-customizations-audit-trigger"
   aft_tags                                         = merge(var.tags, { managed_by = "AFT" })
+  # Reuses the same additional_customization_sources entry the customizations
+  # CodeBuild projects already attach (see modules/aft-customizations), so the
+  # account-request naming gate stays pinned to the exact same qcloud-conftest
+  # version with a single source of truth -- not a separate variable to keep
+  # in sync by hand.
+  conftest_source = one([for s in var.additional_customization_sources : s if s.source_identifier == "conftest"])
   ssm_paths = {
     aft_tf_aws_customizations_module_url_ssm_path     = "/aft/config/aft-pipeline-code-source/repo-url"
     aft_tf_aws_customizations_module_git_ref_ssm_path = "/aft/config/aft-pipeline-code-source/repo-git-ref"

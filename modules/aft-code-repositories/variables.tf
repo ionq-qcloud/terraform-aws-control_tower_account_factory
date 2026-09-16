@@ -109,3 +109,15 @@ variable "aft_enable_vpc" {
 variable "codebuild_compute_type" {
   type = string
 }
+
+variable "conftest_repo_location" {
+  description = "Optional secondary source location for a policy-as-code repo (e.g. qcloud-conftest), attached to the ct-aft-account-request CodeBuild project so its buildspec can run a real, logged naming-convention gate before terraform apply. Null disables the secondary source entirely -- not an upstream AFT concept, kept isolated here to minimize merge conflicts on future upstream version upgrades. Auth reuses this module's own CodeConnections connection (local.connection_arn), so no separate credential is needed."
+  type        = string
+  default     = null
+}
+
+variable "conftest_repo_version" {
+  description = "Git ref/tag pinned for conftest_repo_location's secondary source."
+  type        = string
+  default     = null
+}
