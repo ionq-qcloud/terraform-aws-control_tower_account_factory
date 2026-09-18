@@ -58,6 +58,12 @@ variable "aft_management_account_id" {
   }
 }
 
+variable "landing_zone_cross_account_role_name" {
+  description = "IAM role assumed by this module's own aft_management/tf_backend_secondary_region/audit/log_archive providers to reach the AFT-Management, Audit, and Log Archive accounts -- NOT used for reaching AFT-vended workload accounts, which always go through AWSAFTExecution regardless of this variable. Defaults to upstream's hardcoded AWSControlTowerExecution, so this fork carries zero behavior change for anyone who doesn't set it. Overridable because AWSControlTowerExecution is AWS's own documented pivot-attack path from the management account: some orgs explicitly deny their break-glass identities from ever assuming it directly, in favor of OrganizationAccountAccessRole, which Control Tower and AWS Organizations both reliably create in every account they provision (Log Archive, Audit, AFT-Management) -- confirmed present in all three, in two independent orgs."
+  type        = string
+  default     = "AWSControlTowerExecution"
+}
+
 variable "ct_home_region" {
   description = "The region from which this module will be executed. This MUST be the same region as Control Tower is deployed."
   type        = string
